@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createSimpleStrategy(t *testing.T, store Store) {
+func createSimpleStrategy(t *testing.T, store Store) string {
 	file := NewFile(store)
 	file.SetName("namefile")
 
@@ -48,6 +48,8 @@ func createSimpleStrategy(t *testing.T, store Store) {
 	assert.Equal(t, file.MapData().String("map1"), "v1", "not expected value")
 	assert.Equal(t, file.MapData().String("map2"), "v2", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("text text"), "not expected value")
+
+	return fileId
 }
 
 func deleteSimpleStrategy(t *testing.T, store Store) {
