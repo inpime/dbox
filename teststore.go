@@ -10,13 +10,25 @@ func NewMemoryStore() *MemoryStore {
 	}
 }
 
+func NewMemoryStoreName(name string) *MemoryStore {
+	return &MemoryStore{
+		list: make(map[string][]byte),
+		name: name,
+	}
+}
+
 type MemoryStore struct {
 	sync.RWMutex
 
 	list map[string][]byte
+	name string
 }
 
 // Store interface
+
+func (s MemoryStore) Name() string {
+	return s.name
+}
 
 func (s MemoryStore) Get(id string, obj Object) error {
 	s.Lock()

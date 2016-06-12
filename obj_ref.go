@@ -49,7 +49,8 @@ func (f RefObject) Decode() error {
 func (f *RefObject) Sync() error {
 
 	if f.IsNew() {
-		return ErrEmptyName
+		// ID is the name
+		return ErrEmptyID
 	}
 
 	return f.store.Save(f)

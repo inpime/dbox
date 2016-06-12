@@ -6,31 +6,43 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createSimpleStrategy(t *testing.T, store Store) string {
+func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string {
 	file := NewFile(store)
 	file.SetName("namefile")
+	file.SetMapDataStore(mapStore)
+	file.SetRawDataStore(rawStore)
+
+	var err error
+	err = file.Sync()
 
 	file.Meta().Set("a", "b")
-	err := file.Sync()
-	assert.NoError(t, err, "get by id")
+	// err = file.Sync()
+
+	assert.NoError(t, err, "sync file")
 
 	file.Meta().Set("d", "b")
 
-	file.RawData().Write([]byte("text text"))
-	err = file.Sync()
-	assert.NoError(t, err, "get by id")
-
 	file.MapData().Set("map1", "v1")
-	file.MapData().Set("map2", "v2")
 
+	// err = file.Sync()
+	assert.NoError(t, err, "sync file")
+
+	file.RawData().Write([]byte("text text"))
+	// err = file.Sync()
+	assert.NoError(t, err, "sync file")
+
+	file.MapData().Set("map2", "v2")
 	err = file.Sync()
-	assert.NoError(t, err, "get by id")
+	assert.NoError(t, err, "sync file")
 
 	fileId := file.ID()
 
 	// Load by id
 
 	file, err = NewFileID(fileId, store)
+	file.SetMapDataStore(mapStore)
+	file.SetRawDataStore(rawStore)
+
 	assert.NoError(t, err, "get by id")
 
 	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
@@ -41,7 +53,9 @@ func createSimpleStrategy(t *testing.T, store Store) string {
 
 	// Load by name
 	file, err = NewFileName("namefile", store)
-	assert.NoError(t, err, "get by id")
+	file.SetMapDataStore(mapStore)
+	file.SetRawDataStore(rawStore)
+	assert.NoError(t, err, "get by name")
 
 	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
 	assert.Equal(t, file.Meta().String("d"), "b", "not expected value")
@@ -52,9 +66,11 @@ func createSimpleStrategy(t *testing.T, store Store) string {
 	return fileId
 }
 
-func deleteSimpleStrategy(t *testing.T, store Store) {
+func deleteSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string {
 	file, err := NewFileName("namefile", store)
-	assert.NoError(t, err, "get by id")
+	file.SetMapDataStore(mapStore)
+	file.SetRawDataStore(rawStore)
+	assert.NoError(t, err, "get by name")
 
 	fileId := file.ID()
 
@@ -64,19 +80,25 @@ func deleteSimpleStrategy(t *testing.T, store Store) {
 	// Check remove
 
 	file, err = NewFileID(fileId, store)
+	file.SetMapDataStore(mapStore)
+	file.SetRawDataStore(rawStore)
 	assert.Equal(t, err, ErrNotFound, "get removed file by id")
 
 	file, err = NewFileName("namefile", store)
+	file.SetMapDataStore(mapStore)
+	file.SetRawDataStore(rawStore)
 	assert.Equal(t, err, ErrNotFound, "get removed file by nmae")
+
+	return fileId
 }
 
 func TestFile_simpleStrategy(t *testing.T) {
 	store := NewMemoryStore()
 
-	createSimpleStrategy(t, store)
+	createSimpleStrategy(t, store, store, store)
 	assert.Equal(t, len((*MemoryStore)(store).list), 4, "not valid storage")
 
-	deleteSimpleStrategy(t, store)
+	deleteSimpleStrategy(t, store, store, store)
 	assert.Equal(t, len((*MemoryStore)(store).list), 0, "not valid storage")
 }
 

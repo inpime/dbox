@@ -11,9 +11,12 @@ func TestLocalStore_simpleStrategy(t *testing.T) {
 	storePath := "./_testdata/"
 	store := NewLocalStore(storePath)
 
-	fileId := createSimpleStrategy(t, store)
+	fileId := createSimpleStrategy(t, store, store, store)
 
 	file := NewFile(store)
+	file.SetMapDataStore(store)
+	file.SetRawDataStore(store)
+
 	err := store.Get(fileId, file)
 	assert.NoError(t, err, "get file by id for checker")
 
@@ -36,7 +39,7 @@ func TestLocalStore_simpleStrategy(t *testing.T) {
 	assert.NoError(t, err, "wall files")
 	assert.Equal(t, count, 4, "count files")
 
-	deleteSimpleStrategy(t, store)
+	deleteSimpleStrategy(t, store, store, store)
 
 	os.RemoveAll(storePath)
 }
