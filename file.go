@@ -2,7 +2,7 @@ package dbox
 
 import (
 	"github.com/gebv/typed"
-    "time"
+	"time"
 )
 
 var _ Object = (*File)(nil)
@@ -10,16 +10,16 @@ var _ Object = (*File)(nil)
 var (
 	MapDataIDMetaKey = "MapDataID"
 	RawDataIDMetaKey = "RawDataID"
-	CreatedAtKey        = "CreatedAt"
-	UpdatedAtKey = "UpdatedAt"
-    NameKey = "NameKey"
+	CreatedAtKey     = "CreatedAt"
+	UpdatedAtKey     = "UpdatedAt"
+	NameKey          = "NameKey"
 )
 
 func NewFile(store Store) *File {
-    
+
 	return &File{
 		store:     store,
-        MapObject: NewMapObject(store),
+		MapObject: NewMapObject(store),
 	}
 }
 
@@ -31,40 +31,32 @@ type File struct {
 
 	store Store
 
-    err error
-
-    // storeRawData Store
-    // storeStructData Store
-    // storeMetaFileData Store
+	invalid       bool
+	reasoninvalid error
 }
 
 func (f File) String() string {
-    return f.Name()
+	return f.Name()
 }
-
-func (f File) Error() error {
-    return f.err
-}
-
 func (f File) Name() string {
-    return f.Meta().String(NameKey)
+	return f.Meta().String(NameKey)
 }
 
 func (f File) SetName(v string) {
-    f.Meta().Set(NameKey, v)
+	f.Meta().Set(NameKey, v)
 }
 
 func (f File) UpdatedAt() time.Time {
-    return f.Meta().Time(UpdatedAtKey)
+	return f.Meta().Time(UpdatedAtKey)
 }
 
 func (f File) CreatedAt() time.Time {
-    return f.Meta().Time(CreatedAtKey)
+	return f.Meta().Time(CreatedAtKey)
 }
 
 // Meta meta data file
 func (f File) Meta() *typed.Typed {
-    
+
 	return f.Map()
 }
 
@@ -73,7 +65,11 @@ func (f *File) MapData() *typed.Typed {
 	if f.mdata == nil {
 		f.mdata = NewMapObject(f.store)
 
-		err := f.store.Get(f.mapDataID(), f.mdata)
+		var err error
+
+		if len(f.mapDataID()) != 0 {
+			err = f.store.Get(f.mapDataID(), f.mdata)
+		}
 
 		if err == ErrNotFound || len(f.mapDataID()) == 0 {
 			f.mdata.Sync()
@@ -81,9 +77,10 @@ func (f *File) MapData() *typed.Typed {
 			f.MapObject.Sync() // update file props
 		} else if err != nil {
 			// handler error
-            f.err = err
+			f.invalid = true
+			f.reasoninvalid = err
 
-            // TODO: How to address the error?
+			// TODO: How to address the error?
 		}
 	}
 
@@ -94,8 +91,11 @@ func (f *File) MapData() *typed.Typed {
 func (f *File) RawData() Object {
 	if f.rdata == nil {
 		f.rdata = NewRawObject(f.store)
+		var err error
 
-		err := f.store.Get(f.rawDataID(), f.rdata)
+		if len(f.rawDataID()) != 0 {
+			err = f.store.Get(f.rawDataID(), f.rdata)
+		}
 
 		if err == ErrNotFound || len(f.rawDataID()) == 0 {
 			f.rdata.Sync()
@@ -103,9 +103,10 @@ func (f *File) RawData() Object {
 			f.MapObject.Sync() // update file props
 		} else if err != nil {
 			// handler error
-            f.err = err
+			f.invalid = true
+			f.reasoninvalid = err
 
-            // TODO: How to address the error?
+			// TODO: How to address the error?
 		}
 	}
 
@@ -113,38 +114,46 @@ func (f *File) RawData() Object {
 }
 
 func (f *File) Delete() error {
-    if f.IsNew() {
-        return ErrEmptyID
-    }
+	if f.invalid {
+		return f.reasoninvalid
+	}
 
-    if len(f.Name()) == 0 {
-        return ErrEmptyName
-    }
+	if f.IsNew() {
+		return ErrEmptyID
+	}
 
-    f.MapData()
-    if err := f.store.Delete(f.mdata); err != nil {
-        return err
-    }
+	if len(f.Name()) == 0 {
+		return ErrEmptyName
+	}
 
-    f.RawData()
-    if err := f.store.Delete(f.rdata); err != nil {
-        return err
-    }
+	f.MapData()
+	if err := f.store.Delete(f.mdata); err != nil {
+		return err
+	}
 
-    return f.store.Delete(f)
+	f.RawData()
+	if err := f.store.Delete(f.rdata); err != nil {
+		return err
+	}
+
+	return f.store.Delete(f)
 }
 
 func (f *File) Sync() error {
-    if f.IsNew() {
-        f.id = NewUUID()
-        f.BeforeCreate()
-    }
+	if f.invalid {
+		return f.reasoninvalid
+	}
 
-    if len(f.Name()) == 0 {
-        f.SetName(f.ID())
-    }
+	if f.IsNew() {
+		f.id = NewUUID()
+		f.BeforeCreate()
+	}
 
-    f.BeforeUpdate()
+	if len(f.Name()) == 0 {
+		f.SetName(f.ID())
+	}
+
+	f.BeforeUpdate()
 
 	if f.mdata != nil {
 		return f.mdata.Sync()
@@ -168,11 +177,11 @@ func (f *File) Sync() error {
 //---------
 
 func (f *File) BeforeCreate() {
-	f.Meta().Set(CreatedAtKey, time.Now()) 
+	f.Meta().Set(CreatedAtKey, time.Now())
 }
 
-func (f *File) BeforeUpdate()  {
-	f.Meta().Set(UpdatedAtKey, time.Now()) 
+func (f *File) BeforeUpdate() {
+	f.Meta().Set(UpdatedAtKey, time.Now())
 }
 
 func (f File) mapDataID() string {
@@ -194,13 +203,13 @@ func (f File) setRawDataID(id string) {
 // --------
 
 func NewFileID(id string, store Store) (*File, error) {
-    file := NewFile(store)
-    
-	return file, store.Get(id, file) 
+	file := NewFile(store)
+
+	return file, store.Get(id, file)
 }
 
 func NewFileName(name string, store Store) (*File, error) {
-    file := NewFile(store)
-    
-	return file, store.(FileStore).GetByName(name, file)  
+	file := NewFile(store)
+
+	return file, store.(FileStore).GetByName(name, file)
 }
