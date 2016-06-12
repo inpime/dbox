@@ -26,7 +26,8 @@ Any object implements the interface.
 
 # File
 
-Implements an `MapObject`.
+Implements an `MapObject`. 
+Any file refers to bucket. Bucket defines how file storage (sets stores for internal objects of file).
 
 * `Delete() error` - remove file in the store
 * `RawData() Object` - raw data file
@@ -34,6 +35,8 @@ Implements an `MapObject`.
 * `MapData() *typed.Typed` - structured data file
 * `Name() string` - file name
 * `SetName() string` - file name
+* `Bucket()` - bucket name (bucket must exist)
+* `EntityType() EntityType` - type of file (for high-level logic). 
 * `CreatedAt() time.Time` - file creation date
 * `UpdatedAt() time.Time` - file creation date
 * `SetMapDataStore(Store)` - set a repository for structured data file
@@ -45,7 +48,8 @@ The best guide is the test.
 
 - [x] Memory. Stored in the memory (e.g. for testing)
 - [x] The local file system. Need to set path store 
-- [ ] amazon s3
-- [ ] google storage
+- [ ] [amazon s3](https://aws.amazon.com/s3)
+- [ ] [boltdb](https://github.com/boltdb/bolt)
+- [ ] [google storage](https://cloud.google.com/storage/)
 
 Notes. Library [typed](gebv/typed) is temporary.
