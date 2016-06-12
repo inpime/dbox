@@ -43,7 +43,7 @@ func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string 
 	file.SetMapDataStore(mapStore)
 	file.SetRawDataStore(rawStore)
 
-	assert.NoError(t, err, "get by id")
+	assert.NoError(t, err, "get by id %q", fileId)
 
 	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
 	assert.Equal(t, file.Meta().String("d"), "b", "not expected value")

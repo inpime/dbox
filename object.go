@@ -13,10 +13,7 @@ type Object interface {
 	Sync() error
 
 	Bytes() []byte
-	// Write(p []byte) (int, error)
-	// Read(p []byte) (int, error)
 	Write(p []byte)
-	// Read(p []byte) (int, error)
 
 	Decode() error
 	Encode() error

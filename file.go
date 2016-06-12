@@ -6,14 +6,69 @@ import (
 )
 
 var _ Object = (*File)(nil)
+var _ Object = (*Bucket)(nil)
 
 var (
+	NameKey          = "NameKey"
 	MapDataIDMetaKey = "MapDataID"
 	RawDataIDMetaKey = "RawDataID"
 	CreatedAtKey     = "CreatedAt"
 	UpdatedAtKey     = "UpdatedAt"
-	NameKey          = "NameKey"
+
+	BucketKey                = "BucketKey"
+	MapDataStoreNameKey      = "MapDataStoreNameKey"
+	RawDataStoreNameKey      = "RawDataStoreNameKey"
+	MetaDataFileStoreNameKey = "MetaDataFileStoreNameKey"
 )
+
+type EntityType string
+
+var (
+	FileEntityType   EntityType = "file"
+	BucketEntityType EntityType = "bucket"
+)
+
+func NewBucket() *Bucket {
+
+	return &Bucket{
+		File: File{
+			store:     BucketStore,
+			MapObject: NewMapObject(BucketStore),
+		},
+	}
+}
+
+type Bucket struct {
+	File
+}
+
+func (Bucket) Type() EntityType {
+	return BucketEntityType
+}
+
+func (b Bucket) SetMapDataStoreName(v string) {
+	b.Meta().Set(MapDataStoreNameKey, v)
+}
+
+func (b Bucket) SetRawDataStoreName(v string) {
+	b.Meta().Set(RawDataStoreNameKey, v)
+}
+
+func (b Bucket) SetMetaDataStoreName(v string) {
+	b.Meta().Set(MetaDataFileStoreNameKey, v)
+}
+
+func (b Bucket) MapDataStoreName() string {
+	return b.Meta().String(MapDataStoreNameKey)
+}
+
+func (b Bucket) RawDataStoreName() string {
+	return b.Meta().String(RawDataStoreNameKey)
+}
+
+func (b Bucket) MetaDataStoreName() string {
+	return b.Meta().String(MetaDataFileStoreNameKey)
+}
 
 func NewFile(store Store) *File {
 
@@ -117,6 +172,18 @@ func (f *File) rdataObj() Object {
 
 func (f File) String() string {
 	return f.Name()
+}
+
+func (File) Type() EntityType {
+	return FileEntityType
+}
+
+func (f File) Bucket() string {
+	return f.Meta().String(BucketKey)
+}
+
+func (f File) SetBucket(v string) {
+	f.Meta().Set(BucketKey, v)
 }
 
 func (f File) Name() string {
@@ -246,6 +313,7 @@ func (f File) setRawDataID(id string) {
 
 func NewFileID(id string, store Store) (file *File, err error) {
 	file = NewFile(store)
+
 	err = store.Get(id, file)
 
 	if err == nil {
@@ -257,11 +325,42 @@ func NewFileID(id string, store Store) (file *File, err error) {
 
 func NewFileName(name string, store Store) (file *File, err error) {
 	file = NewFile(store)
+
 	err = store.(FileStore).GetByName(name, file)
 
 	if err == nil {
 		// file.init()
 	}
+
+	return
+}
+
+func LoadOrNewFile(bucketName string, fileName string) (file *File, err error) {
+	bucket, err := BucketByName(bucketName)
+	if err != nil {
+
+		if err == ErrNotFound {
+			return nil, ErrNotFoundBucket
+		}
+
+		return
+	}
+
+	file, err = NewFileName(fileName, MustStore(bucket.MetaDataStoreName()))
+	file.SetMapDataStore(MustStore(bucket.MapDataStoreName()))
+	file.SetRawDataStore(MustStore(bucket.RawDataStoreName()))
+
+	if err == ErrNotFound {
+		file.SetName(fileName)
+		file.SetBucket(bucketName)
+	}
+
+	return
+}
+
+func BucketByName(name string) (file *Bucket, err error) {
+	file = NewBucket()
+	err = BucketStore.(FileStore).GetByName(name, file)
 
 	return
 }

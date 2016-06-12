@@ -5,7 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	// "strings"
+	"path/filepath"
+	"strings"
 )
 
 func NewLocalStore(path string) *LocalStore {
@@ -24,14 +25,21 @@ type LocalStore struct {
 	storepath string
 }
 
-func (s LocalStore) formatPathFile(id string) string {
-	return s.storepath + string(os.PathSeparator) + id
+func (s LocalStore) formatPathFile(obj Object) string {
+	if obj, isFile := obj.(*File); isFile && len(obj.Bucket()) > 0 {
+		bucketname := strings.ToLower(obj.Bucket())
+		return filepath.Clean(s.storepath + string(os.PathSeparator) + bucketname + string(os.PathSeparator) + obj.ID())
+	}
+
+	return filepath.Clean(s.storepath + string(os.PathSeparator) + obj.ID())
 }
 
 func (s LocalStore) Get(id string, obj Object) error {
-	filePath := s.formatPathFile(id)
+	obj.SetID(id) // to correctly build the path to the file
+	filePath := s.formatPathFile(obj)
 
 	if !exists(filePath) {
+		obj.SetID("") // force clean, not to be deceived (see function Object.IsNew)
 		return ErrNotFound
 	}
 
@@ -55,7 +63,10 @@ func (s LocalStore) Get(id string, obj Object) error {
 }
 
 func (s *LocalStore) save(obj Object) error {
-	filePath := s.formatPathFile(obj.ID())
+	filePath := s.formatPathFile(obj)
+
+	// TODO: если это файл, добавить вконце еще каталог
+	// ensureDir(filepath.Dir(filePath))
 
 	return ioutil.WriteFile(filePath, obj.Bytes(), 0644)
 }
@@ -73,20 +84,26 @@ func (s *LocalStore) Save(obj Object) (err error) {
 	return err
 }
 
-func (s *LocalStore) delete(id string) error {
-	filePath := s.formatPathFile(id)
+func (s *LocalStore) delete(obj Object) error {
+	filePath := s.formatPathFile(obj)
 
 	return os.Remove(filePath)
 }
 
 func (s *LocalStore) Delete(obj Object) (err error) {
-	if err := s.delete(obj.ID()); err != nil {
+	if err := s.delete(obj); err != nil {
 		return err
 	}
 
 	switch obj := obj.(type) {
 	case *File:
-		err = s.delete(obj.Name())
+		// load refs file
+		fileRef := NewFile(obj.store)
+		if err = s.Get(obj.Name(), fileRef); err != nil {
+			return
+		}
+
+		err = s.delete(fileRef)
 	}
 
 	return err

@@ -23,9 +23,9 @@ func TestLocalStore_simpleStrategy(t *testing.T) {
 	// check exist files
 	assert.True(t, exists(storePath+file.ID()), "check exist file")
 	assert.True(t, exists(storePath+file.Name()), "check exist file")
-	file.MapData()
+	file.MapData() // force init map object
 	assert.True(t, exists(storePath+file.mdata.ID()), "check exist file")
-	file.RawData()
+	file.RawData() // force init raw object
 	assert.True(t, exists(storePath+file.rdata.ID()), "check exist file")
 
 	// check count files

@@ -2,12 +2,16 @@ package dbox
 
 var registredStores = make(map[string]Store)
 
-func GetStore(name string) (Store, error) {
+func RegistryStore(name string, store Store) {
+	registredStores[name] = store
+}
+
+func MustStore(name string) Store {
 	store, exists := registredStores[name]
 
 	if !exists {
-		return nil, ErrNotFound
+		return nil
 	}
 
-	return store, nil
+	return store
 }

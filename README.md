@@ -3,7 +3,9 @@ abstraction layer for store any objects to use same api
 
 [![Build Status](https://travis-ci.org/inpime/dbox.svg?branch=master)](https://travis-ci.org/inpime/dbox)
 
-Status. In pursuit of the ideal architecture and internal api
+Status. In pursuit of the ideal architecture and internal api.
+
+TODO: example of using
 
 # Object
 
@@ -43,6 +45,8 @@ Any file refers to bucket. Bucket defines how file storage (sets stores for inte
 * `SetRawDataStore(Store)` - set a repository for raw data file
 
 The best guide is the test.
+
+TODO: Simple examples for quick start.
 
 # Storages
 
