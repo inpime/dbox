@@ -4,7 +4,6 @@ import (
 	"sync"
 )
 
-
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
 		list: make(map[string][]byte),
@@ -34,48 +33,48 @@ func (s MemoryStore) Get(id string, obj Object) error {
 }
 
 func (s *MemoryStore) save(obj Object) error {
-    s.Lock()
+	s.Lock()
 	defer s.Unlock()
 
 	s.list[obj.ID()] = obj.Bytes()
 
-    return nil
+	return nil
 }
 
 func (s *MemoryStore) Save(obj Object) (err error) {
-    
-    if err := s.save(obj); err != nil {
-        return err
-    }
 
-    switch obj := obj.(type) {
-        case *File:
-            err = s.saveFileRefs(obj)
-    }
+	if err := s.save(obj); err != nil {
+		return err
+	}
+
+	switch obj := obj.(type) {
+	case *File:
+		err = s.saveFileRefs(obj)
+	}
 
 	return err
 }
 
 func (s *MemoryStore) delete(id string) error {
-    s.Lock()
+	s.Lock()
 	defer s.Unlock()
 
 	delete(s.list, id)
 
-    return nil
+	return nil
 }
 
 func (s *MemoryStore) Delete(obj Object) (err error) {
-    if err := s.delete(obj.ID()); err != nil {
-        return err
-    }
+	if err := s.delete(obj.ID()); err != nil {
+		return err
+	}
 
-    switch obj := obj.(type) {
-        case *File:
-            err = s.delete(obj.Name())
-    }
+	switch obj := obj.(type) {
+	case *File:
+		err = s.delete(obj.Name())
+	}
 
-    return err
+	return err
 }
 
 func (s MemoryStore) Type() StoreType {
@@ -85,20 +84,20 @@ func (s MemoryStore) Type() StoreType {
 // FileStore interface
 
 func (s MemoryStore) GetByName(name string, obj Object) error {
-    ref := NewRefObject(&s)
+	ref := NewRefObject(&s)
 
-    if err := s.Get(name, ref); err != nil {
-        return err
-    }
+	if err := s.Get(name, ref); err != nil {
+		return err
+	}
 
-    return s.Get(ref.RefID(), obj) 
+	return s.Get(ref.RefID(), obj)
 }
 
 func (s *MemoryStore) saveFileRefs(file *File) error {
-    // Ref by file name
-    ref := NewRefObject(s)
-    ref.SetID(file.Name())
-    ref.SetRefID(file.ID())
-    
-    return s.save(ref)
+	// Ref by file name
+	ref := NewRefObject(s)
+	ref.SetID(file.Name())
+	ref.SetRefID(file.ID())
+
+	return s.save(ref)
 }

@@ -15,23 +15,23 @@ type RefObject struct {
 	store Store
 }
 
-// Name file name as id 
+// Name file name as id
 func (f RefObject) RefID() string {
-    return string(f.data)
+	return string(f.data)
 }
 
 func (f *RefObject) SetRefID(v string) {
 	f.data = []byte(v)
-    
+
 }
 
 // ID file id as data value
 func (f RefObject) ID() string {
-    return f.id
+	return f.id
 }
 
 func (f *RefObject) SetID(v string) {
-    f.id = v
+	f.id = v
 }
 
 // Encoder

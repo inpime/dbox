@@ -8,23 +8,23 @@ import (
 
 func createSimpleStrategy(t *testing.T, store Store) {
 	file := NewFile(store)
-    file.SetName("namefile")
+	file.SetName("namefile")
 
 	file.Meta().Set("a", "b")
 	err := file.Sync()
-    assert.NoError(t, err, "get by id")
+	assert.NoError(t, err, "get by id")
 
 	file.Meta().Set("d", "b")
 
 	file.RawData().Write([]byte("text text"))
 	err = file.Sync()
-    assert.NoError(t, err, "get by id")
+	assert.NoError(t, err, "get by id")
 
 	file.MapData().Set("map1", "v1")
 	file.MapData().Set("map2", "v2")
 
 	err = file.Sync()
-    assert.NoError(t, err, "get by id")
+	assert.NoError(t, err, "get by id")
 
 	fileId := file.ID()
 
@@ -39,8 +39,8 @@ func createSimpleStrategy(t *testing.T, store Store) {
 	assert.Equal(t, file.MapData().String("map2"), "v2", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("text text"), "not expected value")
 
-    // Load by name
-    file, err = NewFileName("namefile", store)
+	// Load by name
+	file, err = NewFileName("namefile", store)
 	assert.NoError(t, err, "get by id")
 
 	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
@@ -56,15 +56,15 @@ func deleteSimpleStrategy(t *testing.T, store Store) {
 
 	fileId := file.ID()
 
-	err = file.Delete() 
-    assert.NoError(t, err, "remove file")
+	err = file.Delete()
+	assert.NoError(t, err, "remove file")
 
-    // Check remove
+	// Check remove
 
-    file, err = NewFileID(fileId, store)
+	file, err = NewFileID(fileId, store)
 	assert.Equal(t, err, ErrNotFound, "get removed file by id")
 
-    file, err = NewFileName("namefile", store)
+	file, err = NewFileName("namefile", store)
 	assert.Equal(t, err, ErrNotFound, "get removed file by nmae")
 }
 
@@ -75,7 +75,7 @@ func TestFile_simpleStrategy(t *testing.T) {
 	assert.Equal(t, len((*MemoryStore)(store).list), 4, "not valid storage")
 
 	deleteSimpleStrategy(t, store)
-    assert.Equal(t, len((*MemoryStore)(store).list), 0, "not valid storage")
+	assert.Equal(t, len((*MemoryStore)(store).list), 0, "not valid storage")
 }
 
 func BenchmarkFile_simpleStrategy(b *testing.B) {
@@ -84,10 +84,10 @@ func BenchmarkFile_simpleStrategy(b *testing.B) {
 		file := NewFile(store)
 		file.Meta().Set("a", "b")
 
-        file.RawData().Write([]byte("text text"))
-        file.MapData().Set("map1", "v1")
+		file.RawData().Write([]byte("text text"))
+		file.MapData().Set("map1", "v1")
 		file.Sync()
-		
+
 		fileId := file.ID()
 
 		// Load
@@ -96,6 +96,6 @@ func BenchmarkFile_simpleStrategy(b *testing.B) {
 
 		store.Get(fileId, file)
 
-        file.Delete() 
+		file.Delete()
 	}
 }

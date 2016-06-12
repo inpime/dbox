@@ -1,88 +1,95 @@
 package dbox
 
 import (
-    "io/ioutil"
-    "os"
-    "path"
-    "fmt"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
+	// "strings"
 )
 
 func NewLocalStore(path string) *LocalStore {
-    store := &LocalStore{
+	store := &LocalStore{
 		storepath: path,
 	}
 
-    if err := ensureDir(path); err != nil {
-        panic(err)
-    }
+	if err := ensureDir(path); err != nil {
+		panic(err)
+	}
 
 	return store
 }
 
 type LocalStore struct {
-    storepath string
+	storepath string
 }
 
 func (s LocalStore) formatPathFile(id string) string {
-    return s.storepath + string(os.PathSeparator) + id;
+	return s.storepath + string(os.PathSeparator) + id
 }
 
 func (s LocalStore) Get(id string, obj Object) error {
-    filePath := s.formatPathFile(id)
+	filePath := s.formatPathFile(id)
 
-    if !exists(filePath) {
-        return ErrNotFound
-    }
-	
-    b, err := ioutil.ReadFile(filePath)
-    
+	if !exists(filePath) {
+		return ErrNotFound
+	}
 
-    if err != nil {
-        return err
-    }
+	b, err := ioutil.ReadFile(filePath)
 
-    obj.Write(b)
-    obj.SetID(id)
+	// select {
+	//     case strings.HasSuffix(err.Error(), "is a directory"):
+	//         return ErrInvalidData
+	//     default:
+	//         return err
+	// }
 
-    return  obj.Decode()
+	if err != nil {
+		return err
+	}
+
+	obj.Write(b)
+	obj.SetID(id)
+
+	return obj.Decode()
 }
 
 func (s *LocalStore) save(obj Object) error {
-    filePath := s.formatPathFile(obj.ID())
-    
-    return ioutil.WriteFile(filePath, obj.Bytes(), 0644)
+	filePath := s.formatPathFile(obj.ID())
+
+	return ioutil.WriteFile(filePath, obj.Bytes(), 0644)
 }
 
 func (s *LocalStore) Save(obj Object) (err error) {
-    if err := s.save(obj); err != nil {
-        return err
-    }
+	if err := s.save(obj); err != nil {
+		return err
+	}
 
-    switch obj := obj.(type) {
-        case *File:
-            err = s.saveFileRefs(obj)
-    }
+	switch obj := obj.(type) {
+	case *File:
+		err = s.saveFileRefs(obj)
+	}
 
 	return err
 }
 
 func (s *LocalStore) delete(id string) error {
-    filePath := s.formatPathFile(id)
+	filePath := s.formatPathFile(id)
 
-    return os.Remove(filePath)
+	return os.Remove(filePath)
 }
 
 func (s *LocalStore) Delete(obj Object) (err error) {
-    if err := s.delete(obj.ID()); err != nil {
-        return err
-    }
+	if err := s.delete(obj.ID()); err != nil {
+		return err
+	}
 
-    switch obj := obj.(type) {
-        case *File:
-            err = s.delete(obj.Name())
-    }
+	switch obj := obj.(type) {
+	case *File:
+		err = s.delete(obj.Name())
+	}
 
-    return err
+	return err
 }
 
 func (s LocalStore) Type() StoreType {
@@ -92,25 +99,25 @@ func (s LocalStore) Type() StoreType {
 // FileStore interface
 
 func (s LocalStore) GetByName(name string, obj Object) error {
-    ref := NewRefObject(&s)
+	ref := NewRefObject(&s)
 
-    if err := s.Get(name, ref); err != nil {
-        return err
-    }
+	if err := s.Get(name, ref); err != nil {
+		return err
+	}
 
-    return s.Get(ref.RefID(), obj) 
+	return s.Get(ref.RefID(), obj)
 }
 
 func (s *LocalStore) saveFileRefs(file *File) error {
-    // Ref by file name
-    ref := NewRefObject(s)
-    ref.SetID(file.Name())
-    ref.SetRefID(file.ID())
-    
-    return s.save(ref)
+	// Ref by file name
+	ref := NewRefObject(s)
+	ref.SetID(file.Name())
+	ref.SetRefID(file.ID())
+
+	return s.save(ref)
 }
 
-// 
+//
 
 func exists(filename string) bool {
 	if _, err := os.Stat(filename); os.IsNotExist(err) {

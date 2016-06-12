@@ -9,16 +9,15 @@ const (
 )
 
 type FileStore interface {
-    Store
+	Store
 
-    GetByName(name string, obj Object) error
+	GetByName(name string, obj Object) error
 }
 
 type Store interface {
-	
-    Get(id string, obj Object) error
+	Get(id string, obj Object) error
 	Save(Object) error
-    Delete(Object) error
+	Delete(Object) error
 
 	Type() StoreType
 }

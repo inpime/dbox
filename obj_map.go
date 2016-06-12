@@ -1,7 +1,7 @@
 package dbox
 
 import (
-    "github.com/gebv/typed"
+	"github.com/gebv/typed"
 )
 
 var _ Object = (*MapObject)(nil)

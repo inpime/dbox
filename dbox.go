@@ -1,13 +1,13 @@
 package dbox
 
 import (
-    "fmt"
+	"fmt"
 )
 
 var (
-	ErrNotFound = fmt.Errorf("not_found")
-    ErrInvalidData = fmt.Errorf("invalid_data")
+	ErrNotFound    = fmt.Errorf("not_found")
+	ErrInvalidData = fmt.Errorf("invalid_data")
 
-    ErrEmptyName = fmt.Errorf("empty_name")
-    ErrEmptyID = fmt.Errorf("empty_id")
+	ErrEmptyName = fmt.Errorf("empty_name")
+	ErrEmptyID   = fmt.Errorf("empty_id")
 )

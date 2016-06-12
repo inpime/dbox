@@ -1,10 +1,10 @@
 package dbox
 
 import (
-    "strings"
-    "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
+	"strings"
 )
 
 func NewUUID() string {
-    return strings.Replace(uuid.NewV4().String(), "-", "", -1) 
+	return strings.Replace(uuid.NewV4().String(), "-", "", -1)
 }
