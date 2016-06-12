@@ -45,7 +45,7 @@ The best guide is the test.
 
 - [x] Memory. Stored in the memory (e.g. for testing)
 - [x] The local file system. Need to set path store 
-- [] amazon s3
-- [] google storage
+- [ ] amazon s3
+- [ ] google storage
 
 Notes. Library [typed](gebv/typed) is temporary.
