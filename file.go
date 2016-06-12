@@ -31,8 +31,19 @@ type File struct {
 
 	store Store
 
+	mapDataStore Store
+	rawDataStore Store
+
 	invalid       bool
 	reasoninvalid error
+}
+
+func (f *File) SetMapDataStore(store Store) {
+	f.mapDataStore = store
+}
+
+func (f *File) SetRawDataStore(store Store) {
+	f.rawDataStore = store
 }
 
 func (f File) String() string {
@@ -63,12 +74,17 @@ func (f File) Meta() *typed.Typed {
 // MapData struct data file
 func (f *File) MapData() *typed.Typed {
 	if f.mdata == nil {
-		f.mdata = NewMapObject(f.store)
-
 		var err error
+		var store = f.store
+
+		if f.mapDataStore != nil {
+			store = f.mapDataStore
+		}
+
+		f.mdata = NewMapObject(store)
 
 		if len(f.mapDataID()) != 0 {
-			err = f.store.Get(f.mapDataID(), f.mdata)
+			err = store.Get(f.mapDataID(), f.mdata)
 		}
 
 		if err == ErrNotFound || len(f.mapDataID()) == 0 {
@@ -90,11 +106,17 @@ func (f *File) MapData() *typed.Typed {
 // RawData raw data file
 func (f *File) RawData() Object {
 	if f.rdata == nil {
-		f.rdata = NewRawObject(f.store)
 		var err error
+		var store = f.store
+
+		if f.rawDataStore != nil {
+			store = f.rawDataStore
+		}
+
+		f.rdata = NewRawObject(store)
 
 		if len(f.rawDataID()) != 0 {
-			err = f.store.Get(f.rawDataID(), f.rdata)
+			err = store.Get(f.rawDataID(), f.rdata)
 		}
 
 		if err == ErrNotFound || len(f.rawDataID()) == 0 {
