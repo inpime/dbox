@@ -104,8 +104,9 @@ func TestFile_simpleStrategy(t *testing.T) {
 }
 
 func BenchmarkFile_simpleStrategy(b *testing.B) {
+	store := NewMemoryStore()
+
 	for i := 0; i < b.N; i++ {
-		store := NewMemoryStore()
 		file := NewFile(store)
 		mapSet(file.Meta(), "a", "b")
 

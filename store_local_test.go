@@ -53,3 +53,27 @@ func TestLocalStore_simpleStrategy(t *testing.T) {
 
 	os.RemoveAll(storePath)
 }
+
+func BenchmarkLocalFileSystem_simpleStrategy(b *testing.B) {
+	storePath := "./_testdata/"
+	store := NewLocalStore(storePath)
+
+	for i := 0; i < b.N; i++ {
+		file := NewFile(store)
+		mapSet(file.Meta(), "a", "b")
+
+		file.RawData().Write([]byte("text text"))
+		mapSet(file.MapData(), "map1", "v1")
+		file.Sync()
+
+		fileId := file.ID()
+
+		// Load
+
+		file = NewFile(store)
+
+		store.Get(fileId, file)
+
+		file.Delete()
+	}
+}

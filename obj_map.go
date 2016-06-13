@@ -33,6 +33,10 @@ func (f *MapObject) Encode() (err error) {
 // Decoder
 
 func (f MapObject) Decode() error {
+	if len(f.Bytes()) == 0 {
+		// NOTES: not unequivocally case
+		return nil
+	}
 
 	return decode(&f.meta, f.Bytes())
 }

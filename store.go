@@ -5,6 +5,7 @@ type StoreType string
 const (
 	MemoryStoreType StoreType = "memory"
 	LocalStoreType  StoreType = "local"
+	BoltDBStoreType StoreType = "boltdb"
 )
 
 // FileStore implements store data of files

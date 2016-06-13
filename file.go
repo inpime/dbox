@@ -335,6 +335,10 @@ func NewFileName(name string, store Store) (file *File, err error) {
 	return
 }
 
+// LoadOrNewFile return file by bucket name and filename.
+// If not exist bucket, file accepts values nil, err accepts values ErrNotFoundBucket.
+// If not exist file, file accepts values nil, err accepts values ErrNotFound.
+// In cases where file not exist, file name and file bucket name accepts values from arguments.
 func LoadOrNewFile(bucketName string, fileName string) (file *File, err error) {
 	bucket, err := BucketByName(bucketName)
 	if err != nil {
@@ -358,6 +362,8 @@ func LoadOrNewFile(bucketName string, fileName string) (file *File, err error) {
 	return
 }
 
+// BucketByName return bucket from name
+// if not exist file, file accepts values nil, err accepts values ErrNotFound
 func BucketByName(name string) (file *Bucket, err error) {
 	file = NewBucket()
 	err = BucketStore.(FileStore).GetByName(name, file)

@@ -69,3 +69,16 @@ func mapString(m map[string]interface{}, key string) string {
 	}
 	return ""
 }
+
+func superDecodeData(d []byte) []byte {
+	if len(d) > 0 {
+		return d[:len(d)-1]
+	}
+
+	return []byte{}
+}
+
+func superEncodeData(d []byte) []byte {
+
+	return append(d, byte(33)) // append '!'
+}

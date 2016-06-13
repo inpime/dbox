@@ -54,5 +54,5 @@ TODO: Simple examples for quick start.
 - [x] Memory. Stored in the memory (e.g. for testing)
 - [x] The local file system. Need to set path store 
 - [ ] [amazon s3](https://aws.amazon.com/s3)
-- [ ] [boltdb](https://github.com/boltdb/bolt)
+- [x] [boltdb](https://github.com/boltdb/bolt)
 - [ ] [google storage](https://cloud.google.com/storage/)

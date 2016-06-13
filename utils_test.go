@@ -78,3 +78,17 @@ func TestMSGPack_time(t *testing.T) {
 	assert.Equal(t, tMapDecode["a"], tMap["a"], "check map times")
 	assert.Equal(t, tMapDecode["b"], tMap["b"], "check map times")
 }
+
+func TestSuperEncoderDecoder_basic(t *testing.T) {
+	v := superEncodeData([]byte("abc"))
+	vDec := superDecodeData(v)
+
+	assert.EqualValues(t, string(vDec), "abc", "check value")
+}
+
+func BenchmarkSuperEncoderDecoder_basic(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		v := superEncodeData([]byte("abc"))
+		superDecodeData(v)
+	}
+}
