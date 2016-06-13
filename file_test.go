@@ -64,6 +64,29 @@ func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string 
 	assert.Equal(t, mapString(file.MapData(), "map2"), "v2", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("text text"), "not expected value")
 
+	// ---------------------------------
+	// create a file via NewFileName
+	// ---------------------------------
+
+	file1, err := NewFileName("newfile1", store)
+	assert.Equal(t, err, ErrNotFound, "load not existing file")
+	if err == ErrNotFound {
+		mapSet(file1.Meta(), "a", "b")
+		mapSet(file1.MapData(), "a", "b")
+		file1.RawData().Write([]byte("ab"))
+		err := file1.Sync()
+		assert.NoError(t, err, "saved new file via NewFileName")
+	}
+
+	file1, err = NewFileName("newfile1", store)
+	assert.NoError(t, err, ErrNotFound, "want file is existing")
+	assert.Equal(t, mapString(file1.Meta(), "a"), "b", "not expected value")
+	assert.Equal(t, mapString(file1.MapData(), "a"), "b", "not expected value")
+	assert.Equal(t, file1.RawData().Bytes(), []byte("ab"), "not expected value")
+
+	err = file1.Delete()
+	assert.NoError(t, err, ErrNotFound, "remove file")
+
 	return fileId
 }
 

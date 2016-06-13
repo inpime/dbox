@@ -323,13 +323,15 @@ func NewFileID(id string, store Store) (file *File, err error) {
 	return
 }
 
+// NewFileName return file by filename.
+// In cases where file not exist, file name accepts values from arguments.
 func NewFileName(name string, store Store) (file *File, err error) {
 	file = NewFile(store)
 
 	err = store.(FileStore).GetByName(name, file)
 
-	if err == nil {
-		// file.init()
+	if err == ErrNotFound {
+		file.SetName(name)
 	}
 
 	return
