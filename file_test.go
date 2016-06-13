@@ -15,14 +15,14 @@ func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string 
 	var err error
 	err = file.Sync()
 
-	file.Meta().Set("a", "b")
+	mapSet(file.Meta(), "a", "b")
 	// err = file.Sync()
 
 	assert.NoError(t, err, "sync file")
 
-	file.Meta().Set("d", "b")
+	mapSet(file.Meta(), "d", "b")
 
-	file.MapData().Set("map1", "v1")
+	mapSet(file.MapData(), "map1", "v1")
 
 	// err = file.Sync()
 	assert.NoError(t, err, "sync file")
@@ -31,7 +31,8 @@ func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string 
 	// err = file.Sync()
 	assert.NoError(t, err, "sync file")
 
-	file.MapData().Set("map2", "v2")
+	mapSet(file.MapData(), "map2", "v2")
+
 	err = file.Sync()
 	assert.NoError(t, err, "sync file")
 
@@ -45,10 +46,10 @@ func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string 
 
 	assert.NoError(t, err, "get by id %q", fileId)
 
-	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
-	assert.Equal(t, file.Meta().String("d"), "b", "not expected value")
-	assert.Equal(t, file.MapData().String("map1"), "v1", "not expected value")
-	assert.Equal(t, file.MapData().String("map2"), "v2", "not expected value")
+	assert.Equal(t, mapString(file.Meta(), "a"), "b", "not expected value")
+	assert.Equal(t, mapString(file.Meta(), "d"), "b", "not expected value")
+	assert.Equal(t, mapString(file.MapData(), "map1"), "v1", "not expected value")
+	assert.Equal(t, mapString(file.MapData(), "map2"), "v2", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("text text"), "not expected value")
 
 	// Load by name
@@ -57,10 +58,10 @@ func createSimpleStrategy(t *testing.T, store, mapStore, rawStore Store) string 
 	file.SetRawDataStore(rawStore)
 	assert.NoError(t, err, "get by name")
 
-	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
-	assert.Equal(t, file.Meta().String("d"), "b", "not expected value")
-	assert.Equal(t, file.MapData().String("map1"), "v1", "not expected value")
-	assert.Equal(t, file.MapData().String("map2"), "v2", "not expected value")
+	assert.Equal(t, mapString(file.Meta(), "a"), "b", "not expected value")
+	assert.Equal(t, mapString(file.Meta(), "d"), "b", "not expected value")
+	assert.Equal(t, mapString(file.MapData(), "map1"), "v1", "not expected value")
+	assert.Equal(t, mapString(file.MapData(), "map2"), "v2", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("text text"), "not expected value")
 
 	return fileId
@@ -106,10 +107,10 @@ func BenchmarkFile_simpleStrategy(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		store := NewMemoryStore()
 		file := NewFile(store)
-		file.Meta().Set("a", "b")
+		mapSet(file.Meta(), "a", "b")
 
 		file.RawData().Write([]byte("text text"))
-		file.MapData().Set("map1", "v1")
+		mapSet(file.MapData(), "map1", "v1")
 		file.Sync()
 
 		fileId := file.ID()

@@ -16,8 +16,8 @@ func TestDbox_simpleStrategy(t *testing.T) {
 	assert.Equal(t, file.Name(), "image.png", "value file")
 	assert.Equal(t, file.Bucket(), "static", "value file")
 
-	file.Meta().Set("ContentType", "image/png")
-	file.MapData().Set("a", "b")
+	mapSet(file.Meta(), "ContentType", "image/png")
+	mapSet(file.MapData(), "a", "b")
 	file.RawData().Write([]byte("image data ..."))
 	err = file.Sync()
 	assert.NoError(t, err, "saved file")
@@ -28,8 +28,8 @@ func TestDbox_simpleStrategy(t *testing.T) {
 
 	assert.Equal(t, file.Name(), "image.png", "value file")
 	assert.Equal(t, file.Bucket(), "static", "value file")
-	assert.Equal(t, file.Meta().String("ContentType"), "image/png", "value file")
-	assert.Equal(t, file.MapData().String("a"), "b", "value file")
+	assert.Equal(t, mapString(file.Meta(), "ContentType"), "image/png", "value file")
+	assert.Equal(t, mapString(file.MapData(), "a"), "b", "value file")
 	assert.Equal(t, file.RawData().Bytes(), []byte("image data ..."), "value file")
 	assert.Equal(t, file.mdata.store.Type(), MemoryStoreType, "check store type")
 	assert.Equal(t, file.rdata.store.Type(), LocalStoreType, "check store type")

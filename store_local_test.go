@@ -41,5 +41,15 @@ func TestLocalStore_simpleStrategy(t *testing.T) {
 
 	deleteSimpleStrategy(t, store, store, store)
 
+	count = 0
+	err = filepath.Walk(storePath, func(path string, info os.FileInfo, err error) error {
+		if info.Mode().IsRegular() {
+			count++
+		}
+		return nil
+	})
+	assert.NoError(t, err, "wall files")
+	assert.Equal(t, count, 0, "count files")
+
 	os.RemoveAll(storePath)
 }

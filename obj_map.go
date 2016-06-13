@@ -1,14 +1,10 @@
 package dbox
 
-import (
-	"github.com/gebv/typed"
-)
-
 var _ Object = (*MapObject)(nil)
 
 func NewMapObject(store Store) *MapObject {
 	return &MapObject{
-		meta:  typed.New(map[string]interface{}{}),
+		meta:  make(map[string]interface{}),
 		store: store,
 	}
 }
@@ -16,12 +12,12 @@ func NewMapObject(store Store) *MapObject {
 type MapObject struct {
 	object
 
-	meta *typed.Typed
+	meta map[string]interface{}
 
 	store Store
 }
 
-func (f MapObject) Map() *typed.Typed {
+func (f MapObject) Map() map[string]interface{} {
 	return f.meta
 }
 
@@ -38,7 +34,7 @@ func (f *MapObject) Encode() (err error) {
 
 func (f MapObject) Decode() error {
 
-	return decode(f.meta, f.Bytes())
+	return decode(&f.meta, f.Bytes())
 }
 
 func (f *MapObject) Sync() error {

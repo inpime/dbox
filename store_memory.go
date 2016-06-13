@@ -59,6 +59,8 @@ func (s *MemoryStore) Save(obj Object) (err error) {
 		return err
 	}
 
+	// the reference is stored in the same place where meta data file
+
 	switch obj := obj.(type) {
 	case *File:
 		err = s.saveFileRefs(obj)

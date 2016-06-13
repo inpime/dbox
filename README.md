@@ -2,6 +2,7 @@
 abstraction layer for store any objects to use same api
 
 [![Build Status](https://travis-ci.org/inpime/dbox.svg?branch=master)](https://travis-ci.org/inpime/dbox)
+[![Go Report Card](https://goreportcard.com/badge/github.com/inpime/dbox)](https://goreportcard.com/report/github.com/inpime/dbox)
 
 Status. In pursuit of the ideal architecture and internal api.
 
@@ -33,8 +34,8 @@ Any file refers to bucket. Bucket defines how file storage (sets stores for inte
 
 * `Delete() error` - remove file in the store
 * `RawData() Object` - raw data file
-* `Meta() *typed.Typed` - meta data file, `typed.Typed` this is an `map[string]interface{}` with helper functions
-* `MapData() *typed.Typed` - structured data file
+* `Meta() map[string]interface{}` - meta data file
+* `MapData() map[string]interface{}` - structured data file
 * `Name() string` - file name
 * `SetName() string` - file name
 * `Bucket()` - bucket name (bucket must exist)
@@ -55,5 +56,3 @@ TODO: Simple examples for quick start.
 - [ ] [amazon s3](https://aws.amazon.com/s3)
 - [ ] [boltdb](https://github.com/boltdb/bolt)
 - [ ] [google storage](https://cloud.google.com/storage/)
-
-Notes. Library [typed](gebv/typed) is temporary.

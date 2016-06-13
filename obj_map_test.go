@@ -8,7 +8,7 @@ import (
 
 func TestMapObj_ReadWrite(t *testing.T) {
 	m := NewMapObject(nil)
-	m.Map().Set("a", "b")
+	mapSet(m.Map(), "a", "b")
 	m.Encode()
 	network := m.Bytes()
 
@@ -17,7 +17,7 @@ func TestMapObj_ReadWrite(t *testing.T) {
 	err := m.Decode()
 	assert.NoError(t, err, "map decode")
 
-	assert.Equal(t, m.Map().String("a"), "b", "not expected value")
+	assert.Equal(t, mapString(m.Map(), "a"), "b", "not expected value")
 }
 
 func BenchmarkMapObj_ReadWrite(b *testing.B) {

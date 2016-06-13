@@ -1,7 +1,6 @@
 package dbox
 
 import (
-	"github.com/gebv/typed"
 	"time"
 )
 
@@ -47,27 +46,27 @@ func (Bucket) Type() EntityType {
 }
 
 func (b Bucket) SetMapDataStoreName(v string) {
-	b.Meta().Set(MapDataStoreNameKey, v)
+	mapSet(b.Meta(), MapDataStoreNameKey, v)
 }
 
 func (b Bucket) SetRawDataStoreName(v string) {
-	b.Meta().Set(RawDataStoreNameKey, v)
+	mapSet(b.Meta(), RawDataStoreNameKey, v)
 }
 
 func (b Bucket) SetMetaDataStoreName(v string) {
-	b.Meta().Set(MetaDataFileStoreNameKey, v)
+	mapSet(b.Meta(), MetaDataFileStoreNameKey, v)
 }
 
 func (b Bucket) MapDataStoreName() string {
-	return b.Meta().String(MapDataStoreNameKey)
+	return mapString(b.Meta(), MapDataStoreNameKey)
 }
 
 func (b Bucket) RawDataStoreName() string {
-	return b.Meta().String(RawDataStoreNameKey)
+	return mapString(b.Meta(), RawDataStoreNameKey)
 }
 
 func (b Bucket) MetaDataStoreName() string {
-	return b.Meta().String(MetaDataFileStoreNameKey)
+	return mapString(b.Meta(), MetaDataFileStoreNameKey)
 }
 
 func NewFile(store Store) *File {
@@ -179,37 +178,38 @@ func (File) Type() EntityType {
 }
 
 func (f File) Bucket() string {
-	return f.Meta().String(BucketKey)
+	return mapString(f.Meta(), BucketKey)
 }
 
 func (f File) SetBucket(v string) {
-	f.Meta().Set(BucketKey, v)
+	mapSet(f.Meta(), BucketKey, v)
 }
 
 func (f File) Name() string {
-	return f.Meta().String(NameKey)
+
+	return mapString(f.Meta(), NameKey)
 }
 
 func (f File) SetName(v string) {
-	f.Meta().Set(NameKey, v)
+	mapSet(f.Meta(), NameKey, v)
 }
 
 func (f File) UpdatedAt() time.Time {
-	return f.Meta().Time(UpdatedAtKey)
+	return time.Unix(mapInt64(f.Meta(), UpdatedAtKey), 0)
 }
 
 func (f File) CreatedAt() time.Time {
-	return f.Meta().Time(CreatedAtKey)
+	return time.Unix(mapInt64(f.Meta(), CreatedAtKey), 0)
 }
 
 // Meta meta data file
-func (f *File) Meta() *typed.Typed {
+func (f *File) Meta() map[string]interface{} {
 
 	return f.MapObject.Map()
 }
 
 // MapData struct data file
-func (f *File) MapData() *typed.Typed {
+func (f *File) MapData() map[string]interface{} {
 
 	return f.mdataObj().Map()
 }
@@ -286,27 +286,27 @@ func (f *File) Sync() error {
 //---------
 
 func (f *File) BeforeCreate() {
-	f.Meta().Set(CreatedAtKey, time.Now())
+	mapSet(f.Meta(), CreatedAtKey, time.Now().Unix())
 }
 
 func (f *File) BeforeUpdate() {
-	f.Meta().Set(UpdatedAtKey, time.Now())
+	mapSet(f.Meta(), UpdatedAtKey, time.Now().Unix())
 }
 
 func (f File) mapDataID() string {
-	return f.Meta().String(MapDataIDMetaKey)
+	return mapString(f.Meta(), MapDataIDMetaKey)
 }
 
 func (f File) setMapDataID(id string) {
-	f.Meta().Set(MapDataIDMetaKey, id)
+	mapSet(f.Meta(), MapDataIDMetaKey, id)
 }
 
 func (f File) rawDataID() string {
-	return f.Meta().String(RawDataIDMetaKey)
+	return mapString(f.Meta(), RawDataIDMetaKey)
 }
 
 func (f File) setRawDataID(id string) {
-	f.Meta().Set(RawDataIDMetaKey, id)
+	mapSet(f.Meta(), RawDataIDMetaKey, id)
 }
 
 // --------

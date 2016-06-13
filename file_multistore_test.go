@@ -33,8 +33,8 @@ func TestMultiStore_fileAndStorage(t *testing.T) {
 	file.SetMapDataStore(storeMapData)
 	file.SetRawDataStore(storeRawData)
 
-	file.Map().Set("a", "b")
-	file.MapData().Set("c", "d")
+	mapSet(file.Map(), "a", "b")
+	mapSet(file.MapData(), "c", "d")
 	file.RawData().Write([]byte("abc"))
 
 	file.Sync()
@@ -60,8 +60,8 @@ func TestMultiStore_fileAndStorage(t *testing.T) {
 	assert.Equal(t, len((*MemoryStore)(storeMapData).list), 1, "count files storage")
 	assert.Equal(t, len((*MemoryStore)(storeRawData).list), 1, "count files storage")
 
-	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
-	assert.Equal(t, file.MapData().String("c"), "d", "not expected value")
+	assert.Equal(t, mapString(file.Meta(), "a"), "b", "not expected value")
+	assert.Equal(t, mapString(file.MapData(), "c"), "d", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("abc"), "not expected value")
 
 	// after init subobjects
@@ -83,8 +83,8 @@ func TestMultiStore_fileAndStorage(t *testing.T) {
 	assert.Equal(t, len((*MemoryStore)(storeMapData).list), 1, "count files storage")
 	assert.Equal(t, len((*MemoryStore)(storeRawData).list), 1, "count files storage")
 
-	assert.Equal(t, file.Meta().String("a"), "b", "not expected value")
-	assert.Equal(t, file.MapData().String("c"), "d", "not expected value")
+	assert.Equal(t, mapString(file.Meta(), "a"), "b", "not expected value")
+	assert.Equal(t, mapString(file.MapData(), "c"), "d", "not expected value")
 	assert.Equal(t, file.RawData().Bytes(), []byte("abc"), "not expected value")
 
 	// after init subobjects

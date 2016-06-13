@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
+	// "strings"
 )
 
 func NewLocalStore(path string) *LocalStore {
@@ -26,10 +26,6 @@ type LocalStore struct {
 }
 
 func (s LocalStore) formatPathFile(obj Object) string {
-	if obj, isFile := obj.(*File); isFile && len(obj.Bucket()) > 0 {
-		bucketname := strings.ToLower(obj.Bucket())
-		return filepath.Clean(s.storepath + string(os.PathSeparator) + bucketname + string(os.PathSeparator) + obj.ID())
-	}
 
 	return filepath.Clean(s.storepath + string(os.PathSeparator) + obj.ID())
 }
@@ -98,7 +94,8 @@ func (s *LocalStore) Delete(obj Object) (err error) {
 	switch obj := obj.(type) {
 	case *File:
 		// load refs file
-		fileRef := NewFile(obj.store)
+		fileRef := NewRefObject(s)
+
 		if err = s.Get(obj.Name(), fileRef); err != nil {
 			return
 		}

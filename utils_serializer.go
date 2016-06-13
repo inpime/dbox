@@ -1,6 +1,11 @@
 package dbox
 
-import "gopkg.in/vmihailenco/msgpack.v2"
+import (
+	"gopkg.in/vmihailenco/msgpack.v2"
+)
+
+func init() {
+}
 
 func encode(v interface{}) ([]byte, error) {
 	return msgpack.Marshal(v)
