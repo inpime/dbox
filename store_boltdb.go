@@ -2,29 +2,16 @@ package dbox
 
 import (
 	"github.com/boltdb/bolt"
-	"path/filepath"
 	"strings"
-	"time"
 )
 
-func NewBoltDBStore(path string) *BoltDBStore {
+func NewBoltDBStore(db *bolt.DB, bucketname string) *BoltDBStore {
 	store := &BoltDBStore{
-		path: path,
+		bucketname: bucketname,
+		db:         db,
 	}
 
-	if err := ensureDir(filepath.Dir(path)); err != nil {
-		panic(err)
-	}
-
-	var err error
-
-	store.db, err = bolt.Open(path, 0600, &bolt.Options{Timeout: 1 * time.Second})
-
-	if err != nil {
-		panic(err)
-	}
-
-	err = store.db.Update(func(tx *bolt.Tx) error {
+	err := store.db.Update(func(tx *bolt.Tx) error {
 		_, err := tx.CreateBucketIfNotExists([]byte(store.defaultBucket()))
 		return err
 	})
@@ -37,12 +24,12 @@ func NewBoltDBStore(path string) *BoltDBStore {
 }
 
 type BoltDBStore struct {
-	path string
-	db   *bolt.DB
+	bucketname string
+	db         *bolt.DB
 }
 
 func (s BoltDBStore) defaultBucket() string {
-	return "__dbox.buckets.default"
+	return s.bucketname
 }
 
 func (s BoltDBStore) Get(id string, obj Object) error {
