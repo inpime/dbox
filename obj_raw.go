@@ -28,9 +28,7 @@ func (f RawObject) Decode() error {
 
 func (f *RawObject) Sync() error {
 
-	if f.IsNew() {
-		f.id = NewUUID()
-	}
+	f.setNewIDIfNew()
 
 	return f.store.Save(f)
 }

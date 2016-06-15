@@ -116,9 +116,11 @@ func (f *File) mdataObj() *MapObject {
 		}
 
 		if err == ErrNotFound || len(f.mapDataID()) == 0 {
-			f.mdata.Sync()
+			// f.mdata.Sync()
+			f.mdata.setNewIDIfNew()
 			f.setMapDataID(f.mdata.ID())
-			f.syncOnlyMeta() // update file props
+			// f.setNewIDIfNew()
+			// f.syncOnlyMeta() // update file props
 		} else if err != nil {
 			// handler error
 			f.invalid = true
@@ -154,9 +156,11 @@ func (f *File) rdataObj() Object {
 		}
 
 		if err == ErrNotFound || len(f.rawDataID()) == 0 {
-			f.rdata.Sync()
+			// f.rdata.Sync()
+			f.rdata.setNewIDIfNew()
 			f.setRawDataID(f.rdata.ID())
-			f.syncOnlyMeta() // update file props
+			// f.setNewIDIfNew()
+			// f.syncOnlyMeta() // update file props
 		} else if err != nil {
 			// handler error
 			f.invalid = true
@@ -245,8 +249,9 @@ func (f *File) Delete() error {
 }
 
 func (f *File) syncOnlyMeta() error {
+
 	if f.IsNew() {
-		f.id = NewUUID()
+		f.setNewIDIfNew()
 		f.BeforeCreate()
 	}
 

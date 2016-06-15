@@ -73,10 +73,10 @@ func BenchmarkTestBoltDBStore_onlyReadFile(b *testing.B) {
 	fileId := file.ID()
 
 	for i := 0; i < b.N; i++ {
-
-		file = NewFile(store)
-
-		store.Get(fileId, file)
+		_file, _ := NewFileID(fileId, store)
+		_file.ID()
+		_file.MapData()
+		_file.RawData()
 	}
 
 	file.Delete()

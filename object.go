@@ -55,6 +55,12 @@ type object struct {
 	data []byte
 }
 
+func (o *object) setNewIDIfNew() {
+	if o.IsNew() {
+		o.id = NewUUID()
+	}
+}
+
 func (o object) ID() string {
 	return o.id
 }

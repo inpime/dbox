@@ -42,10 +42,7 @@ func (f MapObject) Decode() error {
 }
 
 func (f *MapObject) Sync() error {
-
-	if f.IsNew() {
-		f.id = NewUUID()
-	}
+	f.setNewIDIfNew()
 
 	f.Encode()
 
