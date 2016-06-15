@@ -56,3 +56,13 @@ TODO: Simple examples for quick start.
 - [ ] [amazon s3](https://aws.amazon.com/s3)
 - [x] [boltdb](https://github.com/boltdb/bolt)
 - [ ] [google storage](https://cloud.google.com/storage/)
+
+## Change log
+
+### changed the logic of preserving objects associated with a new file 
+
+new file is saved all at once
+that would not be large delays
+
+fa07a08e3d79331442912791f70244899f638236
+
