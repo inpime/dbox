@@ -32,7 +32,6 @@ func (f *File) Import(b []byte) error {
 }
 
 func (f File) Export() ([]byte, error) {
-	f.Sync()
 
 	archive := fileArchive{
 		Prop: f.MapObject.Bytes(),
