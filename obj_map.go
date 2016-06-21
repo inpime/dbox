@@ -21,6 +21,11 @@ func (f MapObject) Map() map[string]interface{} {
 	return f.meta
 }
 
+func (f *MapObject) SetMap(v map[string]interface{}) *MapObject {
+	f.meta = v
+	return f
+}
+
 // Encoder
 
 func (f *MapObject) Encode() (err error) {
