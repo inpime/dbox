@@ -218,6 +218,11 @@ func (f *File) MapData() map[string]interface{} {
 	return f.mdataObj().Map()
 }
 
+// SetMapData set struct data file
+func (f *File) SetMapData(v map[string]interface{}) {
+	f.mdataObj().SetMap(v)
+}
+
 // RawData raw data file
 func (f *File) RawData() Object {
 
