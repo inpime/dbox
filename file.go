@@ -1,6 +1,7 @@
 package dbox
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -336,6 +337,10 @@ func NewFileID(id string, store Store) (file *File, err error) {
 // NewFileName return file by filename.
 // In cases where file not exist, file name accepts values from arguments.
 func NewFileName(name string, store Store) (file *File, err error) {
+	if store == nil {
+		return nil, fmt.Errorf("empty store")
+	}
+
 	file = NewFile(store)
 
 	err = store.(FileStore).GetByName(name, file)
