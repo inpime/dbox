@@ -1,9 +1,24 @@
 language: go
 go:
     - 1.6
-    - tip
+    - 1.7
+
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.5"
+
+env:
+  DB_ADDR: "localhost:5432"
+  DB_USER: postgres
+  DB_PASS: password
+  DB_NAME: dbox_test
 
 before_install: 
+  - sleep 15
+  - psql -c "create database ${DB_PASS};" -U postgres
+  - psql -c "alter user postgres password '${DB_PASS}';" -U postgres
   - go get github.com/stretchr/testify/assert
   - go get github.com/inpime/dbox
 
