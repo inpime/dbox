@@ -17,8 +17,8 @@ env:
 
 before_install: 
   - sleep 15
-  - psql -c "create database ${DB_PASS};" -U postgres
-  - psql -c "alter user postgres password '${DB_PASS}';" -U postgres
+  - psql -c "create database dbox_test;" -U postgres
+  - psql -c "alter user postgres password 'password';" -U postgres
   - go get github.com/stretchr/testify/assert
   - go get github.com/inpime/dbox
 
