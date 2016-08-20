@@ -6,9 +6,6 @@ go:
 services:
   - postgresql
 
-addons:
-  postgresql: "9.5"
-
 env:
   DB_ADDR: "localhost:5432"
   DB_USER: postgres
@@ -16,6 +13,7 @@ env:
   DB_NAME: dbox_test
 
 before_install: 
+  - sudo /etc/init.d/postgresql start 9.5
   - sleep 60
   - psql -c "create database dbox_test;" -U postgres
   - psql -c "alter user postgres password 'password';" -U postgres
