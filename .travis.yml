@@ -13,6 +13,7 @@ env:
   DB_NAME: dbox_test
 
 before_install: 
+  - sudo /etc/init.d/postgresql stop 9.1
   - sudo /etc/init.d/postgresql start 9.5
   - sleep 60
   - psql -c "create database dbox_test;" -U postgres
