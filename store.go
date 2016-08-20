@@ -6,6 +6,7 @@ const (
 	MemoryStoreType StoreType = "memory"
 	LocalStoreType  StoreType = "local"
 	BoltDBStoreType StoreType = "boltdb"
+	PGStoreType     StoreType = "pg"
 )
 
 // FileStore implements store data of files
