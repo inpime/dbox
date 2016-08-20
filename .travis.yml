@@ -2,6 +2,9 @@ language: go
 go:
     - 1.6
     - 1.7
+    
+addons:
+  postgresql: "9.4"
 
 services:
   - postgresql
@@ -13,9 +16,7 @@ env:
   DB_NAME: dbox_test
 
 before_install: 
-  - sudo /etc/init.d/postgresql stop 9.1
-  - sudo /etc/init.d/postgresql start 9.5
-  - sleep 60
+  - sleep 30
   - psql -c "create database dbox_test;" -U postgres
   - psql -c "alter user postgres password 'password';" -U postgres
   - go get github.com/stretchr/testify/assert
