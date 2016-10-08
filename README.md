@@ -56,6 +56,7 @@ TODO: Simple examples for quick start.
 - [ ] [amazon s3](https://aws.amazon.com/s3)
 - [x] [boltdb](https://github.com/boltdb/bolt)
 - [ ] [google storage](https://cloud.google.com/storage/)
+- [ ] [tarantool](https://tarantool.org/)
 
 ## Change log
 
